@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Warsaw ZTM Radar</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+            integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+            crossorigin=""></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style>
+        #mapid {
+            height: 100%
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="form">
+    <form th:action="@{/find-vehicle}" th:object="${vehicleRequest}" method="post">
+        <p>
+            <input type="radio" name="bus" id="bus" value="1" th:field="*{type}">
+            <label for="bus">Bus</label>
+            <input type="radio" name="tram" id="tram" value="2" th:field="*{type}">
+            <label for="tram">Tram</label>
+        </p>
+        <p>
+            <label for="line">Line: </label>
+            <input type="text" placeholder="Enter line number" id="line" name="line" th:field="*{line}">
+            <label for="brigade">Brigade: </label>
+            <input type="text" placeholder="Enter brigade number" id="brigade" name="brigade" th:field="*{brigade}">
+            <input type="submit" value="Find">
+        </p>
+    </form>
+</div>
+
+<div id="mapid"></div>
+
+</body>
+<script th:inline="javascript" id="refreshMarkers">
+    var vehicles = [[${vehicles}]];
+
+    function refreshMarkers() {
+        $.get("update-location", function (fragment) {
+            $("#refreshMarkers").replaceWith(fragment);
+        });
+        setMarkers();
+    }
+</script>
+
+<script th:inline="javascript">
+    var map = L.map('mapid').setView([52.2297700, 21.0117800], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    var markers = {};
+
+    setMarkers();
+    setInterval(refreshMarkers, 10000);
+
+    function setMarkers() {
+        vehicles.forEach(vehicle => {
+            if (!markers.hasOwnProperty(vehicle.vehicleNumber)) {
+                markers[vehicle.vehicleNumber] = L.marker([vehicle.currentLocation.latitude, vehicle.currentLocation.longitude]).addTo(map)
+                    .bindPopup('Line: ' + vehicle.lineNumber.toString() + '<br> Vehicle number: ' + vehicle.vehicleNumber.toString() + '<br> time: ' + vehicle.currentLocation.timestamp.toString());
+            } else {
+                markers[vehicle.vehicleNumber].setLatLng([vehicle.currentLocation.latitude, vehicle.currentLocation.longitude])
+                    ._popup.setContent('Line: ' + vehicle.lineNumber.toString() + '<br> Vehicle number: ' + vehicle.vehicleNumber.toString() + '<br> time: ' + vehicle.currentLocation.timestamp.toString());
+            }
+        })
+    }
+</script>
+</html>
