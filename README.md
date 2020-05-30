@@ -1,0 +1,1 @@
+https://waw-ztm-radar.herokuapp.com/map/vehicle-location
