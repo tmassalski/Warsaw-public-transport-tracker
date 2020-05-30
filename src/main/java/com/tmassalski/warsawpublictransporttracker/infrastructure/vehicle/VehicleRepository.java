@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Repository
-public class VehicleRepository implements CreateVehicleClient, ClearVehicleRepositoryClient, RetrieveVehicleClient {
+class VehicleRepository implements CreateVehicleClient, ClearVehicleRepositoryClient, RetrieveVehicleClient {
 
     private Set<Vehicle> vehicles = new HashSet<>();
 

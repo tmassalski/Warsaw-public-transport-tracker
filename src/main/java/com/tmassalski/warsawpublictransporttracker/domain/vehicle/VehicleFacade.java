@@ -10,33 +10,21 @@ import java.util.*;
 @Service
 public class VehicleFacade {
 
-    private final VehicleLocationClient vehicleLocationClient;
     private final VehicleCreator vehicleCreator;
+    private final VehicleLocationClient vehicleLocationClient;
+    private final LocationUpdater locationUpdater;
     private final ClearVehicleRepositoryClient clearVehicleRepositoryClient;
-    private final RetrieveVehicleClient retrieveVehicleClient;
-
-    private VehicleRequest vehicleRequest;
 
     public void createVehicles(VehicleRequest vehicleRequest) {
-        this.vehicleRequest = vehicleRequest;
+        String vehicleType = vehicleRequest.getType();
         clearVehicleRepositoryClient.clear();
         List<VehicleLocationCommand> vehicleLocationCommandList = vehicleLocationClient.getVehicleData(vehicleRequest);
-        String vehicleType = vehicleRequest.getType();
         for (VehicleLocationCommand vehicleLocationCommand : vehicleLocationCommandList) {
             vehicleCreator.createVehicle(vehicleType, vehicleLocationCommand);
         }
     }
 
-    public void updateVehicleLocation() {
-        if (vehicleRequest != null) {
-            List<VehicleLocationCommand> vehicleLocationCommandList = vehicleLocationClient.getVehicleData(vehicleRequest);
-            retrieveVehicleClient.getAll()
-                    .forEach(vehicle -> vehicle.currentLocation.setLocation(
-                            vehicleLocationCommandList.stream()
-                                    .filter(vehicleLocationCommand ->
-                                            vehicleLocationCommand.getVehicleNumber().equals(vehicle.vehicleNumber))
-                                    .findFirst()
-                                    .orElseThrow(() -> new RuntimeException("exception"))));
-        }
+    public void updateVehicleLocation(VehicleRequest vehicleRequest) {
+        locationUpdater.update(vehicleRequest);
     }
 }
