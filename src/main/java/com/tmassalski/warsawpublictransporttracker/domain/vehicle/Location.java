@@ -1,15 +1,25 @@
-package com.tmassalski.warsawpublictransporttracker.domain.location;
+package com.tmassalski.warsawpublictransporttracker.domain.vehicle;
 
-import com.tmassalski.warsawpublictransporttracker.domain.vehicle.VehicleLocationCommand;
-import org.springframework.stereotype.Service;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@Service
-public class LocationCreator {
+@Builder
+@AllArgsConstructor
+@Setter
+@Getter
+@EqualsAndHashCode
+class Location {
+    Double latitude;
+    Double longitude;
+    LocalDateTime timestamp;
 
-    public Location build(VehicleLocationCommand vehicleLocationCommand) {
+    static Location build(VehicleLocationCommand vehicleLocationCommand) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return Location.builder()
                 .latitude(vehicleLocationCommand.getLat())

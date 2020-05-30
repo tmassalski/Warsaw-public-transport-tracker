@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @Service
-public class VehicleDataRestClient implements VehicleLocationClient {
+class VehicleDataRestClient implements VehicleLocationClient {
 
     private final RestTemplate restTemplate;
     private final String baseUrl;

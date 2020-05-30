@@ -28,7 +28,7 @@
 </head>
 <body>
 <div class="form">
-    <form th:action="@{/find-vehicle}" th:object="${vehicleRequest}" method="post">
+    <form method="post" th:action="@{/find-vehicle}" th:object="${vehicleRequest}">
         <p>
             <input type="radio" name="bus" id="bus" value="1" th:field="*{type}">
             <label for="bus">Bus</label>
